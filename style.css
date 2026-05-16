@@ -142,6 +142,7 @@ body.is-loaded .loading-screen {
   background: transparent;
   user-select: none;
   -webkit-user-drag: none;
+  backface-visibility: hidden;
   filter: saturate(0.98) contrast(1.01);
 }
 
@@ -200,8 +201,8 @@ body.is-loaded .loading-screen {
 
 .page-cover {
   opacity: 0;
-  filter: blur(16px);
-  transform: translate3d(0, 24px, 0) scale(1.035);
+  filter: blur(10px);
+  transform: translate3d(0, 18px, 0) scale(1.025);
   transition:
     opacity 2.7s ease,
     filter 3s ease,
@@ -267,8 +268,8 @@ body.is-loaded .page-cover.show {
 
 .reveal {
   opacity: 0;
-  filter: blur(12px);
-  transform: translate3d(0, 62px, 0) scale(0.975);
+  filter: blur(6px);
+  transform: translate3d(0, 44px, 0) scale(0.985);
   transition:
     opacity 2.3s ease,
     filter 2.6s ease,
@@ -285,8 +286,8 @@ body.is-loaded .page-cover.show {
 
 body:not(.is-loaded) .page-cover {
   opacity: 0;
-  filter: blur(16px);
-  transform: translate3d(0, 24px, 0) scale(1.035);
+  filter: blur(10px);
+  transform: translate3d(0, 18px, 0) scale(1.025);
 }
 
 .page-cover.reveal {

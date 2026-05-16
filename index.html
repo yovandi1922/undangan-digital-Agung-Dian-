@@ -16,7 +16,7 @@
       property="og:description"
       content="Undangan digital acara Memadik Agung dan Dian."
     />
-    <meta property="og:image" content="assets/images/1.png" />
+    <meta property="og:image" content="assets/images/web/1.jpg" />
     <meta property="og:site_name" content="The Memadik of Agung &amp; Dian" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -25,6 +25,7 @@
       href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="preload" as="image" href="assets/images/web/1.jpg" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -41,10 +42,12 @@
       >
         <img
           class="page-image"
-          src="assets/images/1.png"
-          width="3375"
-          height="6000"
+          src="assets/images/web/1.jpg"
+          width="1280"
+          height="2276"
           alt="Sampul undangan Memadik Agung dan Dian"
+          fetchpriority="high"
+          decoding="async"
         />
         <h1 id="cover-title" class="sr-only">
           The Memadik of Agung and Dian
@@ -58,11 +61,12 @@
       >
         <img
           class="page-image"
-          src="assets/images/2.png"
-          width="3375"
-          height="6000"
+          src="assets/images/web/2.jpg"
+          width="1280"
+          height="2276"
           alt="Pembuka undangan dan informasi pasangan Agung dan Dian"
           loading="lazy"
+          decoding="async"
         />
         <div class="sr-only">
           <h2 id="opening-title">Pembuka dan Pasangan</h2>
@@ -88,11 +92,12 @@
       >
         <img
           class="page-image"
-          src="assets/images/3.png"
-          width="3375"
-          height="6000"
+          src="assets/images/web/3.jpg"
+          width="1280"
+          height="2276"
           alt="Detail acara Memadik Agung dan Dian"
           loading="lazy"
+          decoding="async"
         />
         <div class="sr-only">
           <h2 id="detail-title">Detail Acara Memadik</h2>
@@ -119,7 +124,7 @@
       &uarr;
     </button>
 
-    <audio id="backgroundMusic" preload="auto" loop>
+    <audio id="backgroundMusic" preload="none" loop>
       <source src="assets/audio/ordinary.mp3" type="audio/mpeg" />
     </audio>
 

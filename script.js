@@ -16,7 +16,7 @@ const scrollOptions = {
 window.addEventListener("load", () => {
   window.setTimeout(() => {
     body.classList.add("is-loaded");
-  }, 900);
+  }, 450);
 });
 
 const revealSection = (section) => {
