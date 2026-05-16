@@ -358,21 +358,21 @@ body.is-loaded .invitation::after {
 .page-cover {
   min-height: calc(100vh + var(--section-overlap) + var(--first-screen-buffer));
   min-height: calc(var(--app-height) + var(--section-overlap) + var(--first-screen-buffer));
+  padding-bottom: max(
+    0px,
+    calc(
+      var(--app-height) + var(--section-overlap) + var(--first-screen-buffer) -
+        (var(--frame-width) * 1.778125)
+    )
+  );
   opacity: 1;
   filter: none;
   transform: none;
 }
 
 .page-cover .page-image {
-  height: max(
-    calc(100vh + var(--section-overlap) + var(--first-screen-buffer)),
-    calc(var(--frame-width) * 1.778125)
-  );
-  height: max(
-    calc(var(--app-height) + var(--section-overlap) + var(--first-screen-buffer)),
-    calc(var(--frame-width) * 1.778125)
-  );
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   object-position: center top;
 }
 
