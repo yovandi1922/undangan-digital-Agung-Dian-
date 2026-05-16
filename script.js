@@ -5,15 +5,29 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 let lastScrollY = window.scrollY;
 let musicStarted = false;
 
+const setAppHeight = () => {
+  const height = window.innerHeight || document.documentElement.clientHeight;
+  document.documentElement.style.setProperty("--app-height", `${height}px`);
+};
+
+const refreshAppHeightNearTop = () => {
+  if (window.scrollY <= 2) {
+    setAppHeight();
+  }
+};
+
 const scrollOptions = {
   behavior: prefersReducedMotion.matches ? "auto" : "smooth",
   block: "start",
 };
 
+setAppHeight();
+
 window.addEventListener("load", () => {
+  setAppHeight();
   window.setTimeout(() => {
     body.classList.add("is-loaded");
-  }, 450);
+  }, 260);
 });
 
 const stopMusicTriggers = () => {
@@ -64,3 +78,12 @@ window.addEventListener(
   },
   { passive: true }
 );
+
+window.addEventListener("resize", refreshAppHeightNearTop, { passive: true });
+window.addEventListener("orientationchange", () => {
+  window.setTimeout(setAppHeight, 250);
+});
+
+window.visualViewport?.addEventListener("resize", refreshAppHeightNearTop, {
+  passive: true,
+});
