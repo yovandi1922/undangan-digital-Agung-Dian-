@@ -1,89 +1,167 @@
-const body = document.body;
-const backToTopButton = document.querySelector(".back-to-top");
-const backgroundMusic = document.querySelector("#backgroundMusic");
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-let lastScrollY = window.scrollY;
-let musicStarted = false;
+var body = document.body;
+var backToTopButton = document.querySelector(".back-to-top");
+var backgroundMusic = document.querySelector("#backgroundMusic");
+var prefersReducedMotion = window.matchMedia
+  ? window.matchMedia("(prefers-reduced-motion: reduce)")
+  : { matches: false };
+var lastScrollY = window.scrollY || window.pageYOffset || 0;
+var musicStarted = false;
 
-const setAppHeight = () => {
-  const height = window.innerHeight || document.documentElement.clientHeight;
-  document.documentElement.style.setProperty("--app-height", `${height}px`);
-};
+function hasClass(element, className) {
+  return (" " + element.className + " ").indexOf(" " + className + " ") > -1;
+}
 
-const refreshAppHeightNearTop = () => {
-  if (window.scrollY <= 2) {
+function addClass(element, className) {
+  if (!element) {
+    return;
+  }
+
+  if (element.classList) {
+    element.classList.add(className);
+  } else if (!hasClass(element, className)) {
+    element.className += " " + className;
+  }
+}
+
+function removeClass(element, className) {
+  if (!element) {
+    return;
+  }
+
+  if (element.classList) {
+    element.classList.remove(className);
+  } else {
+    element.className = (" " + element.className + " ")
+      .replace(" " + className + " ", " ")
+      .replace(/^\s+|\s+$/g, "");
+  }
+}
+
+function getScrollY() {
+  return window.scrollY || window.pageYOffset || 0;
+}
+
+function setAppHeight() {
+  var height = window.innerHeight || document.documentElement.clientHeight;
+  document.documentElement.style.setProperty("--app-height", height + "px");
+}
+
+function refreshAppHeightNearTop() {
+  if (getScrollY() <= 2) {
     setAppHeight();
   }
-};
+}
 
-const scrollOptions = {
-  behavior: prefersReducedMotion.matches ? "auto" : "smooth",
-  block: "start",
-};
+function smoothScrollTo(element) {
+  if (!element) {
+    return;
+  }
 
-setAppHeight();
+  try {
+    element.scrollIntoView({
+      behavior: prefersReducedMotion.matches ? "auto" : "smooth",
+      block: "start"
+    });
+  } catch (error) {
+    element.scrollIntoView(true);
+  }
+}
 
-window.addEventListener("load", () => {
+function showLoadedState() {
   setAppHeight();
-  window.setTimeout(() => {
-    body.classList.add("is-loaded");
+  window.setTimeout(function () {
+    addClass(body, "is-loaded");
   }, 260);
-});
+}
 
-const stopMusicTriggers = () => {
+function stopMusicTriggers() {
   window.removeEventListener("scroll", handleMusicScroll);
-};
+}
 
-const startMusic = async () => {
+function startMusic() {
+  var playResult;
+
   if (!backgroundMusic || !backgroundMusic.paused || musicStarted) {
     stopMusicTriggers();
     return;
   }
 
   backgroundMusic.volume = 0.42;
+  playResult = backgroundMusic.play();
 
-  try {
-    await backgroundMusic.play();
-    musicStarted = true;
-    stopMusicTriggers();
-  } catch (error) {
-    // Browsers may wait for a stronger user gesture before allowing audio.
+  if (playResult && typeof playResult.then === "function") {
+    playResult
+      .then(function () {
+        musicStarted = true;
+        stopMusicTriggers();
+      })
+      .catch(function () {
+        // Browsers may wait for a stronger user gesture before allowing audio.
+      });
+    return;
   }
-};
 
-const handleMusicScroll = () => {
-  const currentScrollY = window.scrollY;
-  const isScrollingDown = currentScrollY > lastScrollY;
+  musicStarted = true;
+  stopMusicTriggers();
+}
+
+function handleMusicScroll() {
+  var currentScrollY = getScrollY();
+  var isScrollingDown = currentScrollY > lastScrollY;
 
   lastScrollY = currentScrollY;
 
   if (isScrollingDown && currentScrollY > 8) {
     startMusic();
   }
-};
+}
 
-window.addEventListener("scroll", handleMusicScroll, { passive: true });
+function updateBackToTop() {
+  var currentScrollY = getScrollY();
+  var shouldShow = currentScrollY > window.innerHeight * 0.8;
 
-backgroundMusic?.addEventListener("error", stopMusicTriggers, { once: true });
+  if (backToTopButton) {
+    if (shouldShow) {
+      addClass(backToTopButton, "is-visible");
+    } else {
+      removeClass(backToTopButton, "is-visible");
+    }
+  }
+}
 
-backToTopButton?.addEventListener("click", () => {
-  document.querySelector("#cover")?.scrollIntoView(scrollOptions);
-});
+setAppHeight();
 
+if (document.readyState === "complete") {
+  showLoadedState();
+} else {
+  window.addEventListener("load", showLoadedState, false);
+}
+
+window.addEventListener("scroll", handleMusicScroll, false);
+window.addEventListener("scroll", updateBackToTop, false);
+window.addEventListener("resize", refreshAppHeightNearTop, false);
 window.addEventListener(
-  "scroll",
-  () => {
-    const shouldShow = window.scrollY > window.innerHeight * 0.8;
-    backToTopButton?.classList.toggle("is-visible", shouldShow);
+  "orientationchange",
+  function () {
+    window.setTimeout(setAppHeight, 250);
   },
-  { passive: true }
+  false
 );
 
-window.addEventListener("resize", refreshAppHeightNearTop, { passive: true });
-window.addEventListener("orientationchange", () => {
-  window.setTimeout(setAppHeight, 250);
-});
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", refreshAppHeightNearTop, false);
+}
 
-window.visualViewport?.addEventListener("resize", refreshAppHeightNearTop, {
-  passive: true,
-});
+if (backgroundMusic) {
+  backgroundMusic.addEventListener("error", stopMusicTriggers, false);
+}
+
+if (backToTopButton) {
+  backToTopButton.addEventListener(
+    "click",
+    function () {
+      smoothScrollTo(document.querySelector("#cover"));
+    },
+    false
+  );
+}
