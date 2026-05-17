@@ -162,7 +162,7 @@ body.is-loaded .invitation::after {
 .ambient-effects {
   position: absolute;
   inset: 0;
-  z-index: 9;
+  z-index: 5;
   pointer-events: none;
   overflow: hidden;
 }
@@ -261,7 +261,7 @@ body.is-loaded .invitation::after {
 }
 
 .page:nth-child(3) {
-  z-index: 2;
+  z-index: 12;
 }
 
 .page-image {
@@ -401,11 +401,11 @@ body.is-loaded .page-cover.show {
 
 .map-button {
   position: absolute;
-  top: 45.95%;
-  left: 40.2%;
-  z-index: 10;
-  width: 19.6%;
-  height: 3.45%;
+  top: 44.9%;
+  left: 37.2%;
+  z-index: 30;
+  width: 25.6%;
+  height: 5.2%;
   min-width: 0;
   min-height: 0;
   padding: 0;

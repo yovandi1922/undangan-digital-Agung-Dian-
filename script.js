@@ -1,11 +1,28 @@
 var body = document.body;
 var backToTopButton = document.querySelector(".back-to-top");
+var mapButton = document.querySelector(".map-button");
 var backgroundMusic = document.querySelector("#backgroundMusic");
 var prefersReducedMotion = window.matchMedia
   ? window.matchMedia("(prefers-reduced-motion: reduce)")
   : { matches: false };
 var lastScrollY = window.scrollY || window.pageYOffset || 0;
 var musicStarted = false;
+var musicTrying = false;
+var musicRetryTimer = null;
+var musicRetryCount = 0;
+var musicEvents = [
+  "click",
+  "touchstart",
+  "touchend",
+  "touchmove",
+  "pointerdown",
+  "pointermove",
+  "mousedown",
+  "mousemove",
+  "keydown",
+  "wheel",
+  "scroll"
+];
 
 function hasClass(element, className) {
   return (" " + element.className + " ").indexOf(" " + className + " ") > -1;
@@ -75,7 +92,18 @@ function showLoadedState() {
 }
 
 function stopMusicTriggers() {
-  window.removeEventListener("scroll", handleMusicScroll);
+  var i;
+  var handler;
+
+  for (i = 0; i < musicEvents.length; i += 1) {
+    handler = musicEvents[i] === "scroll" ? handleMusicScroll : handleMusicGesture;
+    window.removeEventListener(musicEvents[i], handler, false);
+  }
+
+  if (musicRetryTimer) {
+    window.clearTimeout(musicRetryTimer);
+    musicRetryTimer = null;
+  }
 }
 
 function startMusic() {
@@ -86,6 +114,11 @@ function startMusic() {
     return;
   }
 
+  if (musicTrying) {
+    return;
+  }
+
+  musicTrying = true;
   backgroundMusic.volume = 0.42;
   playResult = backgroundMusic.play();
 
@@ -93,16 +126,33 @@ function startMusic() {
     playResult
       .then(function () {
         musicStarted = true;
+        musicTrying = false;
         stopMusicTriggers();
       })
       .catch(function () {
-        // Browsers may wait for a stronger user gesture before allowing audio.
+        musicTrying = false;
+        scheduleMusicRetry();
       });
     return;
   }
 
   musicStarted = true;
+  musicTrying = false;
   stopMusicTriggers();
+}
+
+function scheduleMusicRetry() {
+  if (musicStarted || musicRetryCount >= 4) {
+    return;
+  }
+
+  musicRetryCount += 1;
+  musicRetryTimer = window.setTimeout(startMusic, 350);
+}
+
+function handleMusicGesture() {
+  musicRetryCount = 0;
+  startMusic();
 }
 
 function handleMusicScroll() {
@@ -112,7 +162,7 @@ function handleMusicScroll() {
   lastScrollY = currentScrollY;
 
   if (isScrollingDown && currentScrollY > 8) {
-    startMusic();
+    handleMusicGesture();
   }
 }
 
@@ -137,7 +187,14 @@ if (document.readyState === "complete") {
   window.addEventListener("load", showLoadedState, false);
 }
 
-window.addEventListener("scroll", handleMusicScroll, false);
+for (var i = 0; i < musicEvents.length; i += 1) {
+  window.addEventListener(
+    musicEvents[i],
+    musicEvents[i] === "scroll" ? handleMusicScroll : handleMusicGesture,
+    false
+  );
+}
+
 window.addEventListener("scroll", updateBackToTop, false);
 window.addEventListener("resize", refreshAppHeightNearTop, false);
 window.addEventListener(
@@ -161,6 +218,38 @@ if (backToTopButton) {
     "click",
     function () {
       smoothScrollTo(document.querySelector("#cover"));
+    },
+    false
+  );
+}
+
+if (mapButton) {
+  mapButton.addEventListener(
+    "click",
+    function (event) {
+      var href = mapButton.getAttribute("href");
+
+      if (!href) {
+        return;
+      }
+
+      event.preventDefault();
+      window.open(href, "_blank");
+    },
+    false
+  );
+
+  mapButton.addEventListener(
+    "touchend",
+    function (event) {
+      var href = mapButton.getAttribute("href");
+
+      if (!href) {
+        return;
+      }
+
+      event.preventDefault();
+      window.open(href, "_blank");
     },
     false
   );
